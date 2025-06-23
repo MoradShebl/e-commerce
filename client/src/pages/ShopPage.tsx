@@ -1,10 +1,10 @@
 import { useParams } from 'react-router-dom';
-import items from '../../items.json';
 import ProductCard from '../components/ProductCard';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 
 const ShopPage = () => {
   const { dress_style } = useParams<{ dress_style?: string }>();
+  const [items, setItems] = useState<any[]>([]);
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedType, setSelectedType] = useState<string>('');
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -14,10 +14,26 @@ const ShopPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
 
-  const prices = items.map((i) => i.offer_price);
+  // Fetch items from backend
+  useEffect(() => {
+    fetch("http://localhost:5000/api/items")
+      .then(res => res.json())
+      .then(data => setItems(data));
+  }, []);
+
+  // Defensive: avoid errors if items is empty
+  const prices = items.length > 0 ? items.map((i) => i.offer_price) : [0];
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   const [priceRange, setPriceRange] = useState<number>(maxPrice);
+
+  // Update price range when items are loaded
+  useEffect(() => {
+    if (items.length > 0) {
+      const prices = items.map((i) => i.offer_price);
+      setPriceRange(Math.max(...prices));
+    }
+  }, [items]);
 
   // Memoize filtered items to avoid recalculation on every render
   const filteredItems = useMemo(() => {
@@ -29,7 +45,7 @@ const ShopPage = () => {
         (selectedSizes.length === 0 || selectedSizes.some((size) => item.sizes.includes(size))) &&
         item.offer_price <= priceRange
     );
-  }, [dress_style, selectedColor, selectedType, selectedSizes, priceRange]);
+  }, [items, dress_style, selectedColor, selectedType, selectedSizes, priceRange]);
 
   const typefilteredItems = useMemo(() => {
     return items.filter(
@@ -37,7 +53,7 @@ const ShopPage = () => {
         (!dress_style || item.dress_style === dress_style) &&
         (selectedColor === '' || item.colors.includes(selectedColor))
     );
-  }, [dress_style, selectedColor]);
+  }, [items, dress_style, selectedColor]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);

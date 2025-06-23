@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Plus, Minus } from 'lucide-react';
-import items from "../../items.json"
 import { useParams } from 'react-router-dom';
 import ShowCase from '../components/ShowCase';
 
@@ -11,12 +10,22 @@ const ProductPage: React.FC = () => {
     const [quantity, setQuantity] = useState<number>(1);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const [product, setProduct] = useState<any>(null);
+    const [items, setItems] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<'reviews'>('reviews');
     const [reviewStars, setReviewStars] = useState(5)
     const [displayPostReview, setDisplayPostReview] = useState(false)
     const [reviewsToShow, setReviewsToShow] = useState(4)
 
+    // Fetch items from backend
     useEffect(() => {
+        fetch("http://localhost:5000/api/items")
+            .then(res => res.json())
+            .then(data => setItems(data));
+    }, []);
+
+    // Find product by name from fetched items
+    useEffect(() => {
+        if (!items.length) return;
         const foundProduct = items.find(item =>
             item.name.toLowerCase().replace(/\s+/g, '-') === productName?.toLowerCase()
         );
@@ -25,7 +34,7 @@ const ProductPage: React.FC = () => {
             setProduct(foundProduct);
             setSelectedColor(foundProduct.colors[0]);
         }
-    }, [productName]);
+    }, [items, productName]);
 
     if (!product) {
         return (

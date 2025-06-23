@@ -4,7 +4,6 @@ import MainPage from './pages/MainPage';
 import ProductPage from './pages/ProductPage';
 import ShopPage from './pages/ShopPage';
 import NotFoundPage from './components/NotFoundPage';
-import AdminPage from './pages/AdminPage';
 import Footer from './components/Footer';
 
 function App() {
@@ -13,7 +12,6 @@ function App() {
       <Router>
         <Header />
         <Routes>
-          <Route path="/admin" element={<AdminPage />} />
           <Route path="/products/:name" element={<ProductPage />} />
           <Route path="/shop/:dress_style" element={<ShopPage />} />
           <Route path="/" element={<MainPage />} />
