@@ -7,6 +7,7 @@ const MainPage = () => {
     <>
       <HeroSection />
       <Brands />
+      <ShowCase name="On Sale" filter_type="on_sale" />
       <ShowCase name="Top Selling" filter_type="top_selling" />
 
 
@@ -21,7 +22,7 @@ const MainPage = () => {
               className={"relative h-64 rounded-xl overflow-hidden cursor-pointer w-full flex justify-around bg-white hover:scale-103 transition-transform duration-300"}
             >
               <img
-                src="https://www.britishhouse.shop/cdn/shop/products/00_505b9ab3-f951-4635-a507-12d2f4c0a817_1800x1800.jpg?v=1658950890"
+                src="https://m.media-amazon.com/images/I/71BAtCZmsvL._UY1100_.jpg"
                 alt='Casual style'
                 className=" h-full object-cover duration-500 "
               />
@@ -56,7 +57,7 @@ const MainPage = () => {
               onClick={() => window.location.href = `/shop/Party`} className={"relative h-64 rounded-xl overflow-hidden cursor-pointer w-full flex justify-around bg-white hover:scale-103 transition-transform duration-300"}
             >
               <img
-                src="https://media.alshaya.com/adobe/assets/urn:aaid:aem:37118b2b-6780-4ad3-b58f-b180ff21e7c2/as/AR-0193-2194-647_5.jpg?height=630"
+                src="https://i5.walmartimages.com/seo/HSMQHJWE-White-Collar-Shirt-Men-Mens-Cut-Dress-Shirts-Men-S-Summer-Casual-Top-Solid-Color-Fashion-Half-Sleeve-Button-Stand-Blouse-Silk-Short-Fo_baa60719-9581-4e8b-a333-f0bc36fa9033.d411a58106309a4c3a49e4f441502b62.jpeg?odnHeight=768&odnWidth=768&odnBg=FFFFFF&odnDynImageQuality=10&format=avif"
                 alt='Party style'
                 className=" h-full object-cover  duration-500  "
               />
@@ -72,8 +73,8 @@ const MainPage = () => {
               onClick={() => window.location.href = `/shop/Gym`} className={"relative h-64 rounded-xl overflow-hidden cursor-pointer md:w-3/4 flex justify-around bg-white hover:scale-103 transition-transform duration-300"}
             >
               <img
-                src="https://m.media-amazon.com/images/I/41SU+6IsrnL._AC_SX522_.jpg"
-                alt='Casual style'
+                src="https://img.clevup.in/352617/trendy-mens-round-neck-half-sleeve-gym-tshirt72-1707827180931_SKU-5101_0.jpg?width=600&format=webp"
+                alt='Gym style'
                 className=" h-full object-cover  duration-500   "
               />
               <div className="absolute bg-white bg-opacity-20 -hover:bg-opacity-30 transition-all" />

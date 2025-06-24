@@ -33,7 +33,7 @@ const Icons = {
   )
 };
 
-const navItems: string[] = ['Shop', 'On Sale', 'New Arrivals', 'Brands'];
+const navItems: string[] = ['Shop', 'On Sale', 'Top Selling', 'Brands'];
 
 // GSAP CDN script loader
 const loadGSAP = () => {
@@ -56,6 +56,10 @@ const Header: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState<boolean>(false);
   const [gsap, setGsap] = useState<any>(null);
+  const [items, setItems] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
   
   const menuLinksRef = useRef<(HTMLAnchorElement | null)[]>([]);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -76,6 +80,27 @@ const Header: React.FC = () => {
       console.error('Failed to load GSAP:', error);
     });
   }, []);
+
+  // Fetch items on mount
+  useEffect(() => {
+    fetch("http://localhost:5000/api/items")
+      .then(res => res.json())
+      .then(data => setItems(data));
+  }, []);
+
+  // Filter items by name when searchTerm changes
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+    const results = items.filter(item =>
+      item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    ).slice(0, 3);
+    setSearchResults(results);
+    setShowSearchDropdown(results.length > 0);
+  }, [searchTerm, items]);
 
   // Mobile menu animation
   useEffect(() => {
@@ -319,7 +344,7 @@ const Header: React.FC = () => {
                     <a
                       key={item}
                       ref={(el) => { dropdownItemsRef.current[index] = el; }}
-                      href="#"
+                      href={`/shop/${item}`}
                       className="text-gray-600 text-sm hover:text-black hover:bg-gray-50 px-3 py-2 rounded transition-colors duration-200 block"
                     >
                       {item}
@@ -328,9 +353,9 @@ const Header: React.FC = () => {
                 </div>
               </div>
 
-              <a href="#" className="text-gray-600 text-sm hover:text-black flex items-center gap-1 ml-6 transition-colors duration-200">On Sale</a>
-              <a href="#new-arrivals" className="text-gray-600 text-sm hover:text-black flex items-center gap-1 transition-colors duration-200">New Arrivals</a>
-              <a href="#brands" className="text-gray-600 text-sm hover:text-black flex items-center gap-1 transition-colors duration-200">Brands</a>
+              <a href="/shop/on_sale" className="text-gray-600 text-sm hover:text-black flex items-center gap-1 ml-6 transition-colors duration-200">On Sale</a>
+              <a href="/shop/top_selling" className="text-gray-600 text-sm hover:text-black flex items-center gap-1 transition-colors duration-200">Top Selling</a>
+              <a href="/#brands" className="text-gray-600 text-sm hover:text-black flex items-center gap-1 transition-colors duration-200">Brands</a>
             </div>
 
             {/* Search Bar - Hidden on Mobile & Tablet */}
@@ -339,10 +364,39 @@ const Header: React.FC = () => {
                 type="search"
                 placeholder="Search for products..."
                 className="w-full px-4 py-2 pl-12 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                onFocus={() => setShowSearchDropdown(searchResults.length > 0)}
+                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 150)}
               />
               <svg className="w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
+              {/* Search Results Dropdown */}
+              {showSearchDropdown && (
+                <div className="absolute left-0 top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  {searchResults.map((item, idx) => (
+                    <a
+                      key={item._id || idx}
+                      href={`/product/${item._id || ''}`}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                    >
+                      <img
+                        src={item.images[Object.keys(item.images)[0]][0] || ''}
+                        alt={item.name}
+                        className="w-12 h-12 object-cover rounded"
+                      />
+                      <div>
+                        <div className="font-semibold text-gray-800">{item.name}</div>
+                        <div className="text-sm text-gray-500">${item.price}</div>
+                      </div>
+                    </a>
+                  ))}
+                  {searchResults.length === 0 && (
+                    <div className="px-4 py-3 text-gray-500 text-sm">No products found.</div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-4">
@@ -390,7 +444,7 @@ const Header: React.FC = () => {
                         <a
                           key={item}
                           ref={(el) => { mobileDropdownItemsRef.current[index] = el; }}
-                          href="#"
+                          href={`shop/${item}`}
                           className="block text-gray-500 text-base hover:text-black hover:bg-gray-50 px-3 py-1 rounded transition-colors duration-200"
                         >
                           {item}
@@ -401,16 +455,22 @@ const Header: React.FC = () => {
                 </div>
 
                 {/* Other Mobile Menu Items */}
-                {navItems.slice(1).map((item, index) => (
-                  <a
-                    key={index + 1}
-                    ref={(el) => { menuLinksRef.current[index + 1] = el; }}
-                    href="#"
-                    className="block text-gray-600 text-lg hover:text-black hover:bg-gray-50 px-2 py-1 rounded transition-colors duration-200"
-                  >
-                    {item}
-                  </a>
-                ))}
+                {navItems.slice(1).map((item, index) => {
+                  let href = "#";
+                  if (item === "On Sale") href = "/shop/on_sale";
+                  else if (item === "Top Selling") href = "/shop/top_selling";
+                  else if (item === "Brands") href = "/#brands";
+                  return (
+                    <a
+                      key={index + 1}
+                      ref={(el) => { menuLinksRef.current[index + 1] = el; }}
+                      href={href}
+                      className="block text-gray-600 text-lg hover:text-black hover:bg-gray-50 px-2 py-1 rounded transition-colors duration-200"
+                    >
+                      {item}
+                    </a>
+                  );
+                })}
               </div>
             </div>
           </nav>

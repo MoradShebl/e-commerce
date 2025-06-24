@@ -370,7 +370,7 @@ const ProductPage: React.FC = () => {
                     )}
                 </div>
                 {/* Show Case */}
-                <ShowCase name="You might also like" filter_type={product.type} />
+                <ShowCase name="You might also like" filter_type={product.type} view_all={false} />
             </div>
         </section >
     );

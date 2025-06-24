@@ -56,7 +56,15 @@ const FilteredProductList = ({ filter_type }: FilteredProductListProps) => {
   useEffect(() => {
     let result = [...items];
 
-    if (filter_type === "newest") {
+    if (filter_type === "on_sale") {
+      result = items
+        .filter((item) => item.quantity > 0 && (item.price - item.offer_price) > 0)
+        .sort((a, b) => (b.price - b.offer_price) - (a.price - a.offer_price)); // Highest discount first
+    } else if (filter_type === "top_selling") {
+      result = result
+        .filter((item) => item.quantity < 10 && item.quantity > 0)
+        .sort((a, b) => a.quantity - b.quantity);
+    } else if (filter_type === "newest") {
       const today = new Date();
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(today.getDate() - 7);
@@ -64,19 +72,11 @@ const FilteredProductList = ({ filter_type }: FilteredProductListProps) => {
       result = result
         .filter((item) => {
           if (!item.date || typeof item.date !== "string") return false;
-
           const itemDate = new Date(item.date);
           if (isNaN(itemDate as any)) return false;
-
           return item.quantity > 0 && itemDate >= sevenDaysAgo;
         })
         .sort((a, b) => (new Date(b.date) > new Date(a.date) ? 1 : -1));
-    }
-
-    if (filter_type === "top_selling") {
-      result = result
-        .filter((item) => item.quantity < 10 && item.quantity > 0)
-        .sort((a, b) => a.quantity - b.quantity);
     } else {
       result = result
         .filter((item) => item.quantity > 0)

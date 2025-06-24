@@ -37,14 +37,31 @@ const ShopPage = () => {
 
   // Memoize filtered items to avoid recalculation on every render
   const filteredItems = useMemo(() => {
-    return items.filter(
+    let filtered = items.filter(
       (item) =>
-        (!dress_style || item.dress_style === dress_style) &&
+        (
+          dress_style === "on_sale" ||
+          dress_style === "top_selling" ||
+          !dress_style ||
+          item.dress_style === dress_style
+        ) &&
         (selectedColor === '' || item.colors.includes(selectedColor)) &&
         (selectedType === '' || item.type === selectedType) &&
         (selectedSizes.length === 0 || selectedSizes.some((size) => item.sizes.includes(size))) &&
         item.offer_price <= priceRange
     );
+
+    if (dress_style === "on_sale") {
+      filtered = filtered.sort(
+        (a, b) => (b.price - b.offer_price) - (a.price - a.offer_price)
+      );
+    } else if (dress_style === "top_selling") {
+      filtered = filtered.sort(
+        (a, b) => a.quantity - b.quantity
+      );
+    }
+
+    return filtered;
   }, [items, dress_style, selectedColor, selectedType, selectedSizes, priceRange]);
 
   const typefilteredItems = useMemo(() => {
