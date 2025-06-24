@@ -444,7 +444,7 @@ const Header: React.FC = () => {
                         <a
                           key={item}
                           ref={(el) => { mobileDropdownItemsRef.current[index] = el; }}
-                          href={`shop/${item}`}
+                          href={`/shop/${item}`}
                           className="block text-gray-500 text-base hover:text-black hover:bg-gray-50 px-3 py-1 rounded transition-colors duration-200"
                         >
                           {item}
